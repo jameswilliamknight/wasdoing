@@ -36,13 +36,16 @@ if [ -f "$REQUIREMENTS" ]; then
     fi
 fi
 
-# Change to script directory before running Python
-cd "$SCRIPT_DIR"
+# Install the package in development mode if not already installed
+if ! pip show wasdoing &>/dev/null; then
+    pip install -e "$SCRIPT_DIR" &>/dev/null
+fi
 
+# Run the module
 if [ $# -eq 0 ]; then
-    python3 __main__.py --help
+    python3 -m wasdoing --help
 else
-    python3 __main__.py "$@"
+    python3 -m wasdoing "$@"
 fi
 
 # Deactivate virtual environment (silently)

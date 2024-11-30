@@ -28,12 +28,14 @@ doc -w                   # Watch mode
 ## Command Reference
 
 ### Setup & Configuration
+
 ```bash
 doc --setup              # Run interactive setup
 doc --verify            # Check configuration
 ```
 
 ### Context Management
+
 ```bash
 doc -c, --context NAME   # Switch to a context
 doc -n, --new-context   # Create new context
@@ -41,6 +43,7 @@ doc -l, --list-contexts # List all contexts
 ```
 
 ### Entry Management
+
 ```bash
 doc -H, --add-history   # Add history entry
 doc -s, --add-summary   # Add summary entry
@@ -49,6 +52,7 @@ doc --summary          # View summary entries
 ```
 
 ### Output Management
+
 ```bash
 doc -w, --watch        # Watch mode: auto-regenerate
 doc -r, --hot-reload   # Alias for --watch
@@ -75,6 +79,7 @@ Our documentation is organized into several sections:
     -   Storage structure
 
 -   [Watch Mode Guide](docs/watch-mode.md)
+
     -   Real-time updates
     -   Context integration
     -   Terminal setup
@@ -139,3 +144,7 @@ For commercial use inquiries, please contact jknightdev@gmail.com or visit [jkni
 -   [Project Structure](docs/project-structure.md)
 -   [Contributing Guide](docs/contributing.md)
 -   [Development Setup](docs/development.md)
+
+### TODO
+
+-   [ ] `doc --move-config /mnt/c/gdrive/j3k.2004/cloud/obsidian/`

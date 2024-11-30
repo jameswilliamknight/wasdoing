@@ -23,12 +23,6 @@ from .config import (
     ensure_setup,
 )
 from .interactive import setup_wizard
-from .database import (
-    add_history_entry,
-    add_summary_entry,
-    get_history_entries,
-    get_summary_entries,
-)
 
 __all__ = [
     "ensure_setup",
@@ -40,8 +34,4 @@ __all__ = [
     "list_contexts",
     "create_context",
     "delete_context",
-    "add_history_entry",
-    "add_summary_entry",
-    "get_history_entries",
-    "get_summary_entries",
 ]
