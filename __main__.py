@@ -245,6 +245,11 @@ def main():
     try:
         args = parser.parse_args()
 
+        # Handle setup command first, before any other operations
+        if args.setup:
+            setup_wizard()
+            sys.exit(0)
+
         # Check if setup is needed before any other operations
         if not ensure_setup():
             console.print("[yellow]Was Doing needs to be set up first.[/yellow]")
