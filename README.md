@@ -152,6 +152,3 @@ For commercial use inquiries, please contact jknightdev@gmail.com or visit [jkni
 -   [Contributing Guide](docs/contributing.md)
 -   [Development Setup](docs/development.md)
 
-### TODO
-
--   [ ] `doc --move-config /mnt/c/gdrive/j3k.2004/cloud/obsidian/`

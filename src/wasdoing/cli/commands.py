@@ -36,7 +36,7 @@ def ensure_venv():
             venv.create(venv_path, with_pip=True)
 
             # Get the path to our package directory
-            package_dir = Path(__file__).parent.parent.parent
+            package_dir = Path(__file__).parent.parent.parent.parent
 
             # Install our package in the new venv
             pip = venv_path / "bin" / "pip"
