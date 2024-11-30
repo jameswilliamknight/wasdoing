@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 from typing import Optional
 import toml
+from datetime import datetime
 
 def format_context_name(name: str) -> str:
     """
@@ -35,23 +36,29 @@ def get_context_output_path(config_dir: Path, context_name: str) -> Path:
 def create_context_structure(config_dir: Path, context_name: str) -> bool:
     """Create the full context directory structure"""
     try:
+        print(f"Creating context directory at {config_dir}")
         context_dir = get_context_path(config_dir, context_name)
         context_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Created directory: {context_dir}")
 
         # Create default context config
         config = {
             "name": context_name,
-            "created_at": str(Path.ctime(context_dir)),
+            "created_at": datetime.now().isoformat(),
             "output_file": "output.md",
             "watch_interval": 1.0,
         }
+        print(f"Created config: {config}")
 
         config_path = get_context_config_path(config_dir, context_name)
+        print(f"Writing config to: {config_path}")
         with open(config_path, "w") as f:
             toml.dump(config, f)
+        print("Config written successfully")
 
         return True
-    except Exception:
+    except Exception as e:
+        print(f"Error creating context structure: {str(e)}")
         return False
 
 def load_context_config(config_dir: Path, context_name: str) -> dict:

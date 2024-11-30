@@ -7,6 +7,8 @@ import subprocess
 import venv
 from pathlib import Path
 from rich.console import Console
+from rich.prompt import Prompt
+import inquirer
 
 from ..setup import (
     setup_wizard,
@@ -23,9 +25,10 @@ from ..ui.sql_shell import run_sql_shell
 
 console = Console()
 
+
 def ensure_venv():
     """Ensure we're running in a virtual environment"""
-    if not hasattr(sys, 'real_prefix') and not sys.base_prefix != sys.prefix:
+    if not hasattr(sys, "real_prefix") and not sys.base_prefix != sys.prefix:
         # We're not in a venv, let's create one and install ourselves
         venv_path = Path.home() / ".local" / "share" / "wasdoing" / "venv"
         if not venv_path.exists():
@@ -50,7 +53,10 @@ def ensure_venv():
 
         # Re-exec the command in the venv
         python = venv_path / "bin" / "python"
-        os.execv(str(python), [str(python), "-m", "wasdoing.cli.commands"] + sys.argv[1:])
+        os.execv(
+            str(python), [str(python), "-m", "wasdoing.cli.commands"] + sys.argv[1:]
+        )
+
 
 def main():
     """Main CLI entry point"""
@@ -69,40 +75,39 @@ def main():
     # Context management
     context_group = parser.add_argument_group("Context Management")
     context_group.add_argument(
-        "--context", "-c", help="Set or switch to a context (project/task)"
+        "--context", "-c",
+        nargs='?',  # Makes the argument optional
+        const="",   # Value when flag is present but no argument given
+        help="Set or switch to a context (project/task). Use without value for interactive menu"
     )
     context_group.add_argument(
         "--list-contexts", "-l", action="store_true", help="List all available contexts"
     )
-    context_group.add_argument(
-        "--new-context", "-n", help="Create a new context"
-    )
+    context_group.add_argument("--new-context", "-n", help="Create a new context")
 
     # Entry management
     entry_group = parser.add_argument_group("Entry Management")
-    entry_group.add_argument(
-        "--add-history", "-H", help="Add a history entry"
-    )
-    entry_group.add_argument(
-        "--add-summary", "-s", help="Add a summary entry"
-    )
+    entry_group.add_argument("--add-history", "-H", help="Add a history entry")
+    entry_group.add_argument("--add-summary", "-s", help="Add a summary entry")
 
     # Output management
     output_group = parser.add_argument_group("Output Management")
     output_group.add_argument(
-        "--watch", "-w", action="store_true",
-        help="Watch mode: automatically regenerate markdown on database changes"
+        "--watch",
+        "-w",
+        action="store_true",
+        help="Watch mode: automatically regenerate markdown on database changes",
     )
     output_group.add_argument(
         "--hot-reload", "-r", action="store_true", help="Alias for --watch"
     )
     output_group.add_argument(
-        "--output", "-o", default="output.md",
-        help="Output path for the generated markdown file"
+        "--output",
+        "-o",
+        default="output.md",
+        help="Output path for the generated markdown file",
     )
-    output_group.add_argument(
-        "--db-path", help="Custom path to the SQLite database"
-    )
+    output_group.add_argument("--db-path", help="Custom path to the SQLite database")
 
     args = parser.parse_args()
 
@@ -144,37 +149,70 @@ def main():
             console.print(f"[red]❌ Failed to create context: {args.new_context}[/red]")
         sys.exit(0)
 
-    if args.context:
-        if set_active_context(args.context):
-            console.print(f"✅ Switched to context: {args.context}")
+    if args.context is not None:  # Changed from if args.context:
+        if args.context == "":  # Handle empty -c flag
+            contexts = list_contexts()
+            if not contexts:
+                console.print("No contexts found. Create one with --new-context")
+                sys.exit(1)
+
+            questions = [
+                inquirer.List(
+                    'context',
+                    message="Choose a context",
+                    choices=[(f"▶️  {ctx}" if ctx == get_active_context() else ctx) for ctx in contexts],
+                )
+            ]
+
+            answers = inquirer.prompt(questions)
+            if not answers:  # User cancelled
+                sys.exit(0)
+
+            # Strip the active marker if present
+            selected = answers['context'].replace("▶️  ", "")
+
+            if set_active_context(selected):
+                console.print(f"✅ Switched to context: {selected}")
+            else:
+                console.print(f"[red]❌ Failed to switch to context: {selected}[/red]")
         else:
-            console.print(f"[red]❌ Context not found: {args.context}[/red]")
-            console.print(
-                "Create it with --new-context or list available contexts with --list-contexts"
-            )
+            if set_active_context(args.context):
+                console.print(f"✅ Switched to context: {args.context}")
+            else:
+                console.print(f"[red]❌ Context not found: {args.context}[/red]")
+                console.print(
+                    "Create it with --new-context or list available contexts with --list-contexts"
+                )
         sys.exit(0)
 
     # Get active context or exit if none
     active_context = get_active_context()
-    if not active_context and (
-        args.add_history or args.add_summary or args.watch or args.hot_reload
-    ):
-        console.print(
-            "[red]❌ No active context. Set one with --context or create new with --new-context[/red]"
-        )
-        sys.exit(1)
 
     # Use configuration or command line arguments
     config_dir = get_config_path()
+
+    # Add this check before trying to use db_path
+    if not active_context and not args.db_path:
+        if not (
+            args.setup
+            or args.new_context
+            or args.list_contexts
+            or args.context is not None
+        ):
+            console.print(
+                "[red]❌ No active context. Use --context to select one or --new-context to create one[/red]"
+            )
+            sys.exit(1)
+
     db_path = (
         Path(args.db_path)
         if args.db_path
-        else get_context_db_path(config_dir, active_context)
+        else get_context_db_path(config_dir, active_context) if active_context else None
     )
-    output_path = Path(args.output)
 
-    # Initialize repository
-    repo = WorkLogRepository(db_path)
+    # Initialize repository only if we need it
+    if db_path:
+        repo = WorkLogRepository(db_path)
 
     # Handle commands
     if args.add_history:
@@ -192,5 +230,6 @@ def main():
     # Handle watch mode
     if args.watch or args.hot_reload:
         from ..ui.watch import watch_database
+
         watch_database(db_path, output_path)
         sys.exit(0)

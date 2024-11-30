@@ -57,7 +57,9 @@ def create_context(name: str) -> bool:
 
         # Initialize empty database
         from ..worklog.repository import WorkLogRepository
-        repo = WorkLogRepository(get_context_db_path(config_dir, name))
+        db_path = get_context_db_path(config_dir, name)
+        repo = WorkLogRepository(db_path)
+        # The repository constructor will initialize the database
         return True
     except Exception:
         return False
