@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "📚 Documentation"
+    url: "https://github.com/jameswilliamknight/was-doing/wiki"
+    about: "Check out our documentation before creating an issue"
+  - name: "💬 Discussions"
+    url: "https://github.com/jameswilliamknight/was-doing/discussions"
+    about: "Please ask and answer questions here"
+  - name: "🤝 Commercial Use"
+    url: "https://github.com/jameswilliamknight/was-doing#license-"
+    about: "Contact us about commercial licensing"

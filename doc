@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Get the directory where the code is located (not where the script is symlinked)
+SCRIPT_DIR="$( cd "$( dirname "$(readlink -f "${BASH_SOURCE[0]}")" )" &> /dev/null && pwd )"
+
+# Quiet mode for pip
+export PIP_QUIET=1
+
+# Function to check dependencies silently
+check_dependency() {
+    if ! command -v "$1" &>/dev/null; then
+        echo "❌ $2 is required but not found"
+        exit 1
+    fi
+}
+
+# Check dependencies silently
+check_dependency "python3" "Python 3"
+check_dependency "pip3" "pip3"
+python3 -c "import venv" &>/dev/null || { echo "❌ Python venv module is required but not found"; exit 1; }
+
+# Create virtual environment if it doesn't exist (silently)
+VENV_DIR="$SCRIPT_DIR/.venv"
+if [ ! -d "$VENV_DIR" ]; then
+    python3 -m venv "$VENV_DIR" &>/dev/null
+fi
+
+# Activate virtual environment (silently)
+source "$VENV_DIR/bin/activate" &>/dev/null
+
+# Install dependencies if requirements.txt exists and packages aren't installed (silently)
+REQUIREMENTS="$SCRIPT_DIR/requirements.txt"
+if [ -f "$REQUIREMENTS" ]; then
+    if ! pip freeze | grep -q "markdown=="; then
+        pip install -r "$REQUIREMENTS" &>/dev/null
+    fi
+fi
+
+# Change to script directory before running Python
+cd "$SCRIPT_DIR"
+
+if [ $# -eq 0 ]; then
+    python3 __main__.py --help
+else
+    python3 __main__.py "$@"
+fi
+
+# Deactivate virtual environment (silently)
+deactivate &>/dev/null
