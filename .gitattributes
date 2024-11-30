@@ -1,0 +1,9 @@
+# Default behavior: normalize line endings
+* text=auto eol=lf
+
+# Python files
+*.py text diff=python
+
+# Windows scripts need CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
