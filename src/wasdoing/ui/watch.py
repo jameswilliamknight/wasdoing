@@ -14,7 +14,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 
 from ..worklog.repository import WorkLogRepository
-from ..worklog.generator import MarkdownGenerator, DefaultTemplate
+from ..worklog.generator import MarkdownGenerator
 
 console = Console()
 
@@ -27,7 +27,7 @@ class DatabaseChangeHandler(FileSystemEventHandler):
         self.db_path = db_path
         self.output_path = output_path
         self.repo = WorkLogRepository(db_path)
-        self.generator = MarkdownGenerator(DefaultTemplate())
+        self.generator = MarkdownGenerator()
 
         # Initial generation
         self._regenerate()
@@ -42,7 +42,7 @@ class DatabaseChangeHandler(FileSystemEventHandler):
         """Regenerate the markdown document"""
         try:
             entries = self.repo.get_all_entries()
-            self.generator.generate(entries, self.output_path)
+            self.generator.generate_from_entries(entries, self.output_path)
             console.print(f"📝 Generated markdown file: {self.output_path}")
         except Exception as e:
             console.print(f"[red]❌ Failed to regenerate: {str(e)}[/red]")

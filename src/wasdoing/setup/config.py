@@ -12,8 +12,10 @@ from ..worklog.context import (
     load_context_config,
 )
 
+
 class Config:
     """Configuration class"""
+
     def __init__(
         self,
         active_context: Optional[str] = None,
@@ -26,12 +28,14 @@ class Config:
         self.default_output = default_output
         self.watch_interval = watch_interval
 
+
 def get_config_path() -> Path:
     """Get the configuration directory path"""
     pointer = Path.home() / ".wwjd" / "config"
     if pointer.exists():
         return Path(pointer.read_text().strip())
     return Path.home() / ".wwjd" / "wasdoing"
+
 
 def ensure_setup() -> Optional[str]:
     """Ensure configuration exists and is valid"""
@@ -46,6 +50,7 @@ def ensure_setup() -> Optional[str]:
 
     return None
 
+
 def create_context(name: str) -> bool:
     """Create a new context"""
     config_dir = get_config_path()
@@ -57,12 +62,12 @@ def create_context(name: str) -> bool:
 
         # Initialize empty database
         from ..worklog.repository import WorkLogRepository
-        db_path = get_context_db_path(config_dir, name)
-        repo = WorkLogRepository(db_path)
-        # The repository constructor will initialize the database
+
+        repo = WorkLogRepository(get_context_db_path(config_dir, name))
         return True
     except Exception:
         return False
+
 
 def list_contexts() -> List[str]:
     """List all available contexts"""
@@ -74,9 +79,11 @@ def list_contexts() -> List[str]:
 
     # Look for context directories that have a database.db file
     return [
-        p.name for p in contexts_dir.iterdir()
+        p.name
+        for p in contexts_dir.iterdir()
         if p.is_dir() and (p / "database.db").exists()
     ]
+
 
 def get_active_context() -> Optional[str]:
     """Get the currently active context"""
@@ -87,6 +94,7 @@ def get_active_context() -> Optional[str]:
         return None
 
     return active_file.read_text().strip()
+
 
 def set_active_context(name: str) -> bool:
     """Set the active context"""
@@ -99,6 +107,7 @@ def set_active_context(name: str) -> bool:
     active_file = config_dir / "active_context"
     active_file.write_text(name)
     return True
+
 
 def delete_context(name: str) -> bool:
     """Delete an existing context"""
@@ -118,6 +127,7 @@ def delete_context(name: str) -> bool:
 
         # Remove the context directory and all its contents
         import shutil
+
         shutil.rmtree(context_dir)
         return True
     except Exception:

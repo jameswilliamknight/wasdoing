@@ -22,17 +22,10 @@ doc --setup
 # Start documenting
 doc -n my-project        # Create a context
 doc -H "Started work"    # Add history
-doc -w                   # Watch mode (creates output.md in context directory)
+doc -w                   # Watch mode
 ```
 
 ## Command Reference
-
-### Getting Help
-
-```bash
-doc --help              # Show basic command help
-doc --help-examples     # Show detailed examples and tips
-```
 
 ### Setup & Configuration
 
@@ -63,7 +56,7 @@ doc --summary          # View summary entries
 ```bash
 doc -w, --watch        # Watch mode: auto-regenerate
 doc -r, --hot-reload   # Alias for --watch
-doc -o, --output PATH  # Set output path (relative to context directory)
+doc -o, --output PATH  # Set output path
 doc -e, --export PATH  # Export to PDF
 ```
 
@@ -151,4 +144,3 @@ For commercial use inquiries, please contact jknightdev@gmail.com or visit [jkni
 -   [Project Structure](docs/project-structure.md)
 -   [Contributing Guide](docs/contributing.md)
 -   [Development Setup](docs/development.md)
-

@@ -25,6 +25,7 @@ from ..ui.sql_shell import run_sql_shell
 
 console = Console()
 
+
 def ensure_venv():
     """Ensure we're running in a virtual environment"""
     if not hasattr(sys, "real_prefix") and not sys.base_prefix != sys.prefix:
@@ -36,7 +37,7 @@ def ensure_venv():
             venv.create(venv_path, with_pip=True)
 
             # Get the path to our package directory
-            package_dir = Path(__file__).parent.parent.parent.parent
+            package_dir = Path(__file__).parent.parent.parent
 
             # Install our package in the new venv
             pip = venv_path / "bin" / "pip"
@@ -55,6 +56,7 @@ def ensure_venv():
         os.execv(
             str(python), [str(python), "-m", "wasdoing.cli.commands"] + sys.argv[1:]
         )
+
 
 def get_examples_text():
     return """Examples and Tips for using the doc command:
@@ -103,6 +105,7 @@ Pro Tips:
   • Watch mode (-w) automatically rebuilds docs on any changes
 """
 
+
 def main():
     """Main CLI entry point"""
     # Ensure we're in a venv before proceeding
@@ -117,76 +120,78 @@ def main():
         description="""Document your work with history and summary entries.
 
 Use --help-examples to see usage examples and tips""",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     # Basic options
     parser.add_argument(
         "--help-examples",
         action="store_true",
-        help="Show examples and tips for using the doc command"
+        help="Show examples and tips for using the doc command",
     )
 
     # Setup commands
     parser.add_argument(
         "--setup",
         action="store_true",
-        help="Run the interactive setup wizard (first-time setup)"
+        help="Run the interactive setup wizard (first-time setup)",
     )
 
     # Context management
-    context_group = parser.add_argument_group('Context Management',
-        description="Commands for managing different work contexts (projects/tasks)")
-    context_group.add_argument(
-        "--context", "-c",
-        nargs='?',  # Makes the argument optional
-        const="",   # Value when flag is present but no argument given
-        help="Set or switch to a context. Use without value for interactive menu"
+    context_group = parser.add_argument_group(
+        "Context Management",
+        description="Commands for managing different work contexts (projects/tasks)",
     )
     context_group.add_argument(
-        "--list-contexts", "-l",
+        "--context",
+        "-c",
+        nargs="?",  # Makes the argument optional
+        const="",  # Value when flag is present but no argument given
+        help="Set or switch to a context. Use without value for interactive menu",
+    )
+    context_group.add_argument(
+        "--list-contexts",
+        "-l",
         action="store_true",
-        help="List all available contexts with their active status"
+        help="List all available contexts with their active status",
     )
     context_group.add_argument(
-        "--new-context", "-n",
-        help="Create a new context (e.g., 'doc -n my-project')"
+        "--new-context", "-n", help="Create a new context (e.g., 'doc -n my-project')"
     )
 
     # Entry management
-    entry_group = parser.add_argument_group('Entry Management',
-        description="Commands for adding entries to your work log")
-    entry_group.add_argument(
-        "--add-history", "-H",
-        help="Add a history entry (what you're doing right now)"
+    entry_group = parser.add_argument_group(
+        "Entry Management", description="Commands for adding entries to your work log"
     )
     entry_group.add_argument(
-        "--add-summary", "-s",
-        help="Add a summary entry (wrap up what you did)"
+        "--add-history", "-H", help="Add a history entry (what you're doing right now)"
+    )
+    entry_group.add_argument(
+        "--add-summary", "-s", help="Add a summary entry (wrap up what you did)"
     )
 
     # Output management
-    output_group = parser.add_argument_group('Output Management',
-        description="Commands for controlling document generation")
-    output_group.add_argument(
-        "--watch", "-w",
-        action="store_true",
-        help="Watch mode: automatically regenerate docs when you make changes"
+    output_group = parser.add_argument_group(
+        "Output Management", description="Commands for controlling document generation"
     )
     output_group.add_argument(
-        "--hot-reload", "-r",
+        "--watch",
+        "-w",
         action="store_true",
-        help="Alias for --watch"
+        help="Watch mode: automatically regenerate docs when you make changes",
     )
     output_group.add_argument(
-        "--output", "-o",
+        "--hot-reload", "-r", action="store_true", help="Alias for --watch"
+    )
+    output_group.add_argument(
+        "--output",
+        "-o",
         default="output.md",
         help="Output path for the generated markdown file. If a relative path is given, "
-             "it will be created in the context directory. (default: output.md)"
+        "it will be created in the context directory. (default: output.md)",
     )
     output_group.add_argument(
-        "--db-path",
-        help="Custom path to the SQLite database (advanced use only)"
+        "--db-path", help="Custom path to the SQLite database (advanced use only)"
     )
 
     args = parser.parse_args()
